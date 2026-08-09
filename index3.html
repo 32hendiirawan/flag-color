@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>World Flag Coloring</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- CDN Flaticon Uicons (Regular Rounded) -->
+  <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/2.1.0/uicons-regular-rounded/css/uicons-regular-rounded.css">
+  <style>
+    html, body {
+      height: 100%;
+      overflow: hidden;
+    }
+
+    #svg-container svg, #feedback-flag-container svg {
+      width: 100%;
+      height: 100%;
+      max-height: 100%;
+      border-radius: 0.75rem;
+    }
+    
+    /* Custom Styling Bendera */
+    .flag-path {
+      cursor: pointer;
+      transition: fill 0.2s ease, stroke-opacity 0.2s ease;
+      stroke: #94a3b8 !important; /* Stroke tipis Slate-400 */
+      stroke-width: 0.5px !important;
+      vector-effect: non-scaling-stroke;
+    }
+    
+    .flag-path:hover {
+      filter: brightness(0.95);
+      stroke: #475569 !important;
+      stroke-width: 0.5px !important;
+    }
+
+    .static-color, .static-color *, .fixed, .fixed * {
+      pointer-events: none !important;
+      cursor: default !important;
+    }
+  </style>
+</head>
+<body class="bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-500 h-screen w-screen flex items-center justify-center p-2 sm:p-4 select-none">
+
+  <!-- LAYAR 1: HOME SCREEN -->
+  <div id="screen-home" class="w-full max-w-sm aspect-[9/16] max-h-[88vh] bg-white/95 backdrop-blur-md rounded-3xl p-6 text-center shadow-2xl border-2 border-white/40 flex flex-col items-center justify-between z-10 my-auto">
+    <div class="my-auto flex flex-col items-center gap-6 w-full">
+      <div class="w-20 h-20 bg-gradient-to-tr from-amber-400 to-pink-500 rounded-3xl flex items-center justify-center text-4xl shadow-lg border-2 border-white text-white">
+        <img src="icon.png" alt="Icon" class="w-full h-full object-contain">
+      </div>
+      <div>
+        <h1 class="text-2xl sm:text-3xl font-black bg-gradient-to-r from-indigo-600 to-pink-600 bg-clip-text text-transparent tracking-tight animate-bounce">World Flag Coloring</h1>
+        <p class="text-slate-500 text-xs sm:text-sm mt-1 font-medium">Mewarnai bendera dunia</p>
+      </div>
+      
+      <div class="w-full flex flex-col gap-3 mt-2">
+        <button id="btn-start-new" type="button" class="w-full bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-bold py-3.5 px-6 rounded-2xl shadow-lg shadow-emerald-500/30 transition flex items-center justify-center gap-2 cursor-pointer active:scale-95">
+          <i class="fi fi-rr-play flex items-center text-lg"></i> <span>New Game</span>
+        </button>
+        <button id="btn-continue" type="button" class="w-full bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white font-bold py-3.5 px-6 rounded-2xl shadow-lg shadow-indigo-500/30 transition flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer active:scale-95">
+          <i class="fi fi-rr-angle-double-right flex items-center text-lg"></i> <span>Continue</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="text-xs text-slate-500 font-semibold bg-slate-100/80 px-4 py-2 rounded-xl w-full border border-slate-200/60" id="progress-info">
+      Mengecek data...
+    </div>
+  </div>
+
+  <!-- LAYAR 2: GAME SCREEN (RASIO 9:16) -->
+  <div id="screen-game" class="hidden bg-white/95 backdrop-blur-md p-3 sm:p-4 rounded-3xl shadow-2xl w-full max-w-sm aspect-[9/16] max-h-[88vh] flex flex-col justify-between border-2 border-white/50 relative my-auto">
+    
+    <!-- Bagian Atas: Box Judul Negara -->
+    <div class="flex-shrink-0 bg-gradient-to-r from-indigo-50 via-purple-50 to-pink-50 p-2.5 rounded-2xl border-2 border-indigo-200/70 text-center shadow-sm relative overflow-hidden">
+      <div class="absolute -top-6 -right-6 w-12 h-12 bg-pink-300/30 rounded-full blur-md"></div>
+      <div class="absolute -bottom-6 -left-6 w-12 h-12 bg-indigo-300/30 rounded-full blur-md"></div>      
+      <h1 class="text-base sm:text-lg font-black text-slate-800 leading-tight px-1 truncate" id="country-title">Loading...</h1>
+    </div>
+
+    <!-- Container Utama SVG Bendera -->
+    <div id="svg-container" class="bg-slate-50/80 border-2 border-slate-200/70 rounded-2xl p-2 my-2 flex-grow flex justify-center items-center min-h-0 overflow-hidden relative shadow-inner">
+      <!-- File SVG dimuat di sini -->
+    </div>
+
+    <!-- Pilihan Warna (Palette) -->
+    <div class="mb-2 flex-shrink-0 bg-slate-100/80 p-2 rounded-2xl border border-slate-200/80">
+      <div id="color-palette" class="flex justify-center gap-2 flex-wrap items-center max-h-[60px] overflow-y-auto p-0.5">
+      </div>
+    </div>
+
+    <!-- Baris Tunggal Navigasi & Aksi Bawah -->
+    <div class="flex items-center justify-between gap-1.5 flex-shrink-0 pt-1 border-t border-slate-200/60">
+      <button id="prev-btn" type="button" class="bg-slate-200 hover:bg-slate-300 active:scale-95 text-slate-700 font-bold p-2.5 rounded-xl text-xs sm:text-sm transition shadow-sm cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center" title="Bendera Sebelumnya">
+        <i class="fi fi-rr-angle-left flex items-center text-lg"></i>
+      </button>
+
+      <button id="btn-back-home" type="button" class="bg-amber-100 hover:bg-amber-200 active:scale-95 text-amber-700 font-bold p-2.5 rounded-xl text-xs sm:text-sm transition shadow-sm cursor-pointer flex items-center justify-center border border-amber-300/50" title="Kembali ke Menu Utama">
+        <i class="fi fi-rr-home flex items-center text-lg"></i>
+      </button>
+
+      <button id="check-btn" type="button" class="flex-1 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 active:scale-95 text-white font-extrabold py-2.5 px-3 rounded-xl text-xs sm:text-sm transition disabled:opacity-40 disabled:cursor-not-allowed shadow-md shadow-emerald-500/20 flex items-center justify-center gap-1.5 cursor-pointer" disabled title="Cek Jawaban">
+        <i class="fi fi-rr-check flex items-center text-lg"></i> <span>Check</span>
+      </button>
+
+      <button id="reset-btn" type="button" class="bg-rose-100 hover:bg-rose-200 active:scale-95 text-rose-600 font-bold p-2.5 rounded-xl text-xs sm:text-sm transition shadow-sm cursor-pointer border border-rose-200 flex items-center justify-center" title="Reset Warna">
+        <i class="fi fi-rr-refresh flex items-center text-lg"></i>
+      </button>
+
+      <button id="next-btn" type="button" class="bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 active:scale-95 text-white font-bold p-2.5 rounded-xl text-xs sm:text-sm transition shadow-md shadow-indigo-500/20 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center" title="Bendera Berikutnya">
+        <i class="fi fi-rr-angle-right flex items-center text-lg"></i>
+      </button>
+    </div>
+
+  </div>
+
+  <!-- LAYAR 3: END SCREEN -->
+  <div id="screen-end" class="hidden w-full max-w-sm aspect-[9/16] max-h-[88vh] bg-white/95 backdrop-blur-md rounded-3xl p-6 text-center shadow-2xl border-2 border-white/40 flex flex-col items-center justify-between z-10 my-auto">
+    <div class="my-auto flex flex-col items-center gap-5 w-full">
+      <div class="relative">
+        <div class="w-24 h-24 bg-gradient-to-tr from-amber-300 via-amber-400 to-amber-500 rounded-3xl flex items-center justify-center text-5xl shadow-xl border-4 border-white text-white animate-bounce">
+          <i class="fi fi-rr-trophy flex items-center text-5xl"></i>
+        </div>
+        <div class="absolute -top-2 -right-2 text-2xl animate-spin text-amber-300">
+          <i class="fi fi-rr-sparkles flex items-center"></i>
+        </div>
+      </div>
+      
+      <div>
+        <h1 class="text-2xl sm:text-3xl font-black bg-gradient-to-r from-amber-500 via-pink-500 to-indigo-600 bg-clip-text text-transparent tracking-tight">Congratulations!</h1>
+        <p class="text-slate-700 text-sm font-bold mt-2">You Are Amazing!</p>
+        <p class="text-slate-500 text-xs sm:text-sm mt-1 font-medium px-2">
+          You have successfully colored and completed all the country flags in the world! 🌍🎉
+        </p>
+      </div>
+
+      <div class="w-full bg-gradient-to-r from-indigo-50 to-pink-50 border-2 border-indigo-100 rounded-2xl p-4 shadow-inner">
+        <p class="text-xs text-indigo-500 font-bold uppercase tracking-wider">Total Score</p>
+        <p id="end-score-text" class="text-2xl font-black text-slate-800 mt-0.5">100% Completed</p>
+      </div>
+      
+      <div class="w-full flex flex-col gap-3 mt-1">
+        <button id="btn-restart-game" type="button" class="w-full bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-bold py-3.5 px-6 rounded-2xl shadow-lg shadow-emerald-500/30 transition flex items-center justify-center gap-2 cursor-pointer active:scale-95">
+          <i class="fi fi-rr-refresh flex items-center text-lg"></i> <span>Restart Game</span>
+        </button>
+        <button id="btn-end-home" type="button" class="w-full bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold py-3 px-6 rounded-2xl transition flex items-center justify-center gap-2 cursor-pointer active:scale-95">
+          <i class="fi fi-rr-home flex items-center text-lg"></i> <span>Back to Main Menu</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- FLOATING FEEDBACK NOTIFICATION (UPDATED: NO CONTAINER BOX & LARGER FLAG) -->
+  <div id="feedback-message" class="pointer-events-none fixed inset-0 flex items-center justify-center z-50 bg-slate-900/60 backdrop-blur-md transition-all duration-300 opacity-0 scale-90 hidden">
+    <div id="feedback-badge" class="px-6 py-6 rounded-3xl font-extrabold text-xl shadow-2xl flex flex-col items-center gap-3 border transform transition-all duration-300 max-w-[300px] w-full text-center">
+      <div id="feedback-icon" class="flex items-center justify-center">
+        <i class="fi fi-rr-badge-check text-5xl animate-bounce"></i>
+      </div>
+      
+      <!-- Container Bendera Tanpa Box/Frame, Ukuran Lebih Besar (h-44) -->
+      <div id="feedback-flag-container" class="w-full h-44 flex items-center justify-center overflow-hidden p-0 drop-shadow-xl hidden">
+        <!-- SVG Clone ditempatkan di sini -->
+      </div>
+
+      <div class="flex flex-col items-center gap-0.5 mt-1">
+        <span id="feedback-country-name" class="text-base font-bold opacity-90 hidden"></span>
+        <span id="feedback-text" class="text-xl font-black">Correct!</span>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const countriesList = [ 
+        // --- AFRIKA ---
+        "Algeria", "Angola", "Benin", "Botswana", "Burkina_Faso",
+        "Burundi", "Cabo_Verde", "Cameroon", "Central_African_Republic", "Chad",
+        "Comoros", "Democratic_Republic_of_the_Congo", "Djibouti", "Egypt", "Equatorial_Guinea",
+        "Eritrea", "Eswatini", "Ethiopia", "Gabon", "Gambia",
+        "Ghana", "Guinea", "Guinea_Bissau", "Ivory_Coast", "Kenya",
+        "Lesotho", "Liberia", "Libya", "Madagascar", "Malawi",
+        "Mali", "Mauritania", "Mauritius", "Morocco", "Mozambique",
+        "Namibia", "Niger", "Nigeria", "Republic_of_the_Congo", "Rwanda",
+        "São_Tomé_and_Príncipe", "Senegal", "Seychelles", "Sierra_Leone", "Somalia",
+        "South_Africa", "South_Sudan", "Sudan", "Tanzania", "Togo",
+        "Tunisia", "Uganda", "Zambia", "Zimbabwe",
+
+        // --- EROPA ---
+        "Albania", "Andorra", "Austria", "Belarus", "Belgium",
+        "Bosnia_and_Herzegovina", "Bulgaria", "Croatia", "Czech_Republic", "Denmark",
+        "Estonia", "Finland", "France", "Germany", "Greece",
+        "Hungary", "Iceland", "Ireland", "Italy", "Latvia",
+        "Liechtenstein", "Lithuania", "Luxembourg", "Malta", "Moldova",
+        "Monaco", "Montenegro", "Netherlands", "North_Macedonia", "Norway",
+        "Poland", "Portugal", "Romania", "San_Marino", "Serbia",
+        "Slovakia", "Slovenia", "Spain", "Sweden", "Switzerland",
+        "Ukraine", "United_Kingdom", "Vatican_City",
+
+        // --- ASIA ---
+        "Afghanistan", "Armenia", "Azerbaijan", "Bahrain", "Bangladesh",
+        "Bhutan", "Brunei", "Cambodia", "China", "Cyprus",
+        "Georgia", "India", "Indonesia", "Iran", "Iraq",
+        "Israel", "Japan", "Jordan", "Kazakhstan", "Kuwait",
+        "Kyrgystan", "Laos", "Lebanon", "Malaysia", "Maldives",
+        "Mongolia", "Myanmar", "Nepal", "North_Korea", "Oman",
+        "Pakistan", "Palestine", "Philippines", "Qatar", "Russia",
+        "Saudi_Arabia", "Singapore", "South_Korea", "Sri_Lanka", "Syria",
+        "Tajikistan", "Thailand", "Timor_Leste", "Turkey", "Turkmenistan",
+        "United_Arab_Emirates", "Uzbekistan", "Vietnam", "Yemen",
+
+        // --- AUSTRALIA & OCEANIA ---
+        "Australia", "Federated_States_of_Micronesia", "Fiji", "Kiribati", "Marshall_Islands",
+        "Nauru", "New_Zealand", "Palau", "Papua_New_Guinea", "Samoa",
+        "Solomon_Islands", "Tonga", "Tuvalu", "Vanuatu",
+
+        // --- AMERIKA SELATAN ---
+        "Argentina", "Bolivia", "Brazil", "Chile", "Colombia",
+        "Ecuador", "Guyana", "Paraguay", "Peru", "Suriname",
+        "Uruguay", "Venezuela",
+
+        // --- AMERIKA UTARA & KARIBIA ---
+        "Antigua_and_Barbuda", "Bahamas", "Barbados", "Belize", "Canada",
+        "Costa_Rica", "Cuba", "Dominica", "Dominican_Republic", "El_Salvador",
+        "Grenada", "Guatemala", "Haiti", "Honduras", "Jamaica",
+        "Mexico", "Nicaragua", "Panama", "Saint_Kitts_and_Nevis", "Saint_Lucia",
+        "Saint_Vincent_and_the_Grenadines", "Trinidad_and_Tobago", "United_States"
+    ];
+
+    const DEFAULT_GRAY = "#D1D5DB";
+
+    const fallbackSvgContent = `
+      <svg viewBox="0 0 300 60" xmlns="http://www.w3.org/2000/svg">
+        <g id="Indonesia" transform="translate(0, 0)">
+          <rect id="id-top" x="0" y="0" width="100" height="30" fill="#FF0000"/>
+          <rect id="id-bot" x="0" y="30" width="100" height="30" fill="#FFFFFF"/>
+        </g>
+        <g id="Japan" transform="translate(150, 0)">
+          <rect id="jp-bg" x="0" y="0" width="100" height="60" fill="#FFFFFF"/>
+          <circle id="jp-sun" cx="50" cy="30" r="18" fill="#BC002D"/>
+        </g>
+      </svg>
+    `;
+
+    let currentFlagIndex = 0;
+    let selectedColor = null;
+    let userColors = {};
+    let originalColors = {}; 
+    let masterOriginalColors = {}; // Cache permanen untuk warna asli dari SVG
+    let svgElement = null;
+    let feedbackTimeout = null;
+    let completedFlags = {};
+
+    // DOM Elements
+    const screenHome = document.getElementById("screen-home");
+    const screenGame = document.getElementById("screen-game");
+    const screenEnd = document.getElementById("screen-end");
+    
+    const btnStartNew = document.getElementById("btn-start-new");
+    const btnContinue = document.getElementById("btn-continue");
+    const btnBackHome = document.getElementById("btn-back-home");
+    const btnRestartGame = document.getElementById("btn-restart-game");
+    const btnEndHome = document.getElementById("btn-end-home");
+    const progressInfo = document.getElementById("progress-info");
+    const endScoreText = document.getElementById("end-score-text");
+
+    const svgContainer = document.getElementById("svg-container");
+    const colorPalette = document.getElementById("color-palette");
+    const countryTitle = document.getElementById("country-title");
+    const checkBtn = document.getElementById("check-btn");
+    const resetBtn = document.getElementById("reset-btn");
+    const prevBtn = document.getElementById("prev-btn");
+    const nextBtn = document.getElementById("next-btn");
+    
+    const feedbackMessage = document.getElementById("feedback-message");
+    const feedbackBadge = document.getElementById("feedback-badge");
+    const feedbackIcon = document.getElementById("feedback-icon");
+    const feedbackText = document.getElementById("feedback-text");
+    const feedbackFlagContainer = document.getElementById("feedback-flag-container");
+    const feedbackCountryName = document.getElementById("feedback-country-name");
+
+    function loadStorage() {
+      try {
+        const saved = localStorage.getItem("flag_quiz_progress_v2");
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          completedFlags = parsed.completedFlags || {};
+          currentFlagIndex = parsed.currentFlagIndex || 0;
+          return true;
+        }
+      } catch (e) {
+        console.error(e);
+      }
+      return false;
+    }
+
+    function saveStorage() {
+      localStorage.setItem("flag_quiz_progress_v2", JSON.stringify({
+        completedFlags: completedFlags,
+        currentFlagIndex: currentFlagIndex
+      }));
+    }
+
+    function refreshHomeUI() {
+      const hasData = loadStorage();
+      const count = Object.keys(completedFlags).length;
+
+      if (hasData && count > 0) {
+        btnContinue.disabled = false;
+        progressInfo.innerText = `${count} / ${countriesList.length} Flags Completed`;
+      } else {
+        btnContinue.disabled = true;
+        progressInfo.innerText = "No progress saved yet.";
+      }
+    }
+
+    // Perekaman warna asli dari seluruh part SVG saat dimuat pertama kali
+    function extractMasterOriginalColors() {
+      if (!svgElement) return;
+      masterOriginalColors = {};
+
+      countriesList.forEach(countryId => {
+        const group = svgElement.querySelector(`g#${countryId}`);
+        if (!group) return;
+        
+        const paths = group.querySelectorAll("path, rect, circle, polygon, ellipse");
+        paths.forEach((p, idx) => {
+          if (!p.id) p.id = `${countryId}-part-${idx}`;
+          
+          let rawFill = p.getAttribute("fill");
+          if (!rawFill || rawFill === "none") {
+            rawFill = window.getComputedStyle(p).fill;
+          }
+          masterOriginalColors[p.id] = rgbToHex(rawFill);
+        });
+      });
+    }
+
+    async function prepareSvg() {
+      if (svgElement) return;
+      
+      try {
+        const res = await fetch("bendera.svg");
+        if (!res.ok) throw new Error("File bendera.svg tidak ada");
+        const svgText = await res.text();
+        svgContainer.innerHTML = svgText;
+      } catch (err) {
+        svgContainer.innerHTML = fallbackSvgContent;
+      }
+      svgElement = svgContainer.querySelector("svg");
+      extractMasterOriginalColors();
+    }
+
+    async function launchGame(isContinueMode) {
+      screenHome.classList.add("hidden");
+      screenEnd.classList.add("hidden");
+      screenGame.classList.remove("hidden");
+
+      await prepareSvg();
+
+      if (!isContinueMode) {
+        completedFlags = {};
+        currentFlagIndex = 0;
+        saveStorage();
+      } else {
+        loadStorage();
+      }
+
+      setTimeout(() => {
+        loadFlagByIndex(currentFlagIndex);
+      }, 50);
+    }
+
+    function showHomeScreen() {
+      refreshHomeUI();
+      screenGame.classList.add("hidden");
+      screenEnd.classList.add("hidden");
+      screenHome.classList.remove("hidden");
+    }
+
+    function showEndScreen() {
+      screenGame.classList.add("hidden");
+      screenHome.classList.add("hidden");
+      screenEnd.classList.remove("hidden");
+      const count = Object.keys(completedFlags).length;
+      endScoreText.innerText = `${count} / ${countriesList.length} Flags`;
+    }
+
+    function getFillablePaths(groupElement) {
+      if (!groupElement) return [];
+      const paths = groupElement.querySelectorAll("path, rect, circle, polygon, ellipse");
+      return Array.from(paths).filter(p => 
+        !p.classList.contains("static-color") && 
+        !p.closest(".static-color") &&
+        !p.classList.contains("fixed") && 
+        !p.closest(".fixed")
+      );
+    }
+
+    function loadFlagByIndex(index) {
+      if (!svgElement) return;
+
+      const countryId = countriesList[index] || countriesList[0];
+      countryTitle.innerText = countryId.replace(/_/g, " ");
+      hideFeedback();
+      userColors = {};
+      originalColors = {};
+      selectedColor = null;
+
+      const allGroups = svgElement.querySelectorAll("g[id]");
+      allGroups.forEach(g => g.style.display = "none");
+
+      let targetGroup = svgElement.querySelector(`g#${countryId}`);
+      if (!targetGroup && allGroups.length > 0) {
+        targetGroup = allGroups[0];
+      }
+
+      if (!targetGroup) return;
+
+      targetGroup.style.display = "inline";
+      const childGroups = targetGroup.querySelectorAll("g");
+      childGroups.forEach(g => g.style.display = "inline");
+
+      const fillablePaths = getFillablePaths(targetGroup);
+
+      fillablePaths.forEach((path, idx) => {
+        if (!path.id) path.id = `${countryId}-part-${idx}`;
+
+        let hexColor = masterOriginalColors[path.id];
+        if (!hexColor || hexColor === DEFAULT_GRAY) {
+          let rawFill = path.getAttribute("fill") || window.getComputedStyle(path).fill;
+          hexColor = rgbToHex(rawFill);
+        }
+
+        originalColors[path.id] = hexColor;
+        path.classList.add("flag-path");
+        
+        path.style.fill = DEFAULT_GRAY; 
+        path.onclick = onPathClick;
+      });
+
+      requestAnimationFrame(() => {
+        try {
+          const bbox = targetGroup.getBBox();
+          const pad = 5;
+          svgElement.setAttribute(
+            "viewBox", 
+            `${bbox.x - pad} ${bbox.y - pad} ${bbox.width + (pad * 2)} ${bbox.height + (pad * 2)}`
+          );
+        } catch(e) {
+          console.error("Gagal membaca BBox bendera:", e);
+        }
+      });
+
+      renderPalette();
+      updateNavButtons();
+      updateCheckButton(fillablePaths);
+    }
+
+    function updateNavButtons() {
+      prevBtn.disabled = currentFlagIndex === 0;
+      const isDone = completedFlags[countriesList[currentFlagIndex]] === true;
+      nextBtn.disabled = !isDone;
+    }
+
+    function renderPalette() {
+      colorPalette.innerHTML = "";
+      const uniqueColors = Array.from(new Set(Object.values(originalColors)));
+      const shuffled = uniqueColors.sort(() => Math.random() - 0.5);
+
+      shuffled.forEach((color, idx) => {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = `w-7 h-7 sm:w-8 sm:h-8 rounded-full border-2 border-white shadow-md transform hover:scale-110 transition flex items-center justify-center flex-shrink-0 cursor-pointer`;
+        btn.style.backgroundColor = color;
+        
+        if (idx === 0) selectPaletteColor(color, btn);
+        btn.onclick = () => selectPaletteColor(color, btn);
+        colorPalette.appendChild(btn);
+      });
+    }
+
+    function selectPaletteColor(color, element) {
+      selectedColor = color;
+      Array.from(colorPalette.children).forEach(child => {
+        child.classList.remove("ring-4", "ring-indigo-500", "scale-110");
+      });
+      element.classList.add("ring-4", "ring-indigo-500", "scale-110");
+    }
+
+    function onPathClick(e) {
+      if (!selectedColor) return;
+      const path = e.target;
+      path.style.fill = selectedColor;
+      userColors[path.id] = selectedColor;
+
+      const activeGroup = svgElement.querySelector(`g#${countriesList[currentFlagIndex]}`) || svgElement.querySelector("g");
+      const fillablePaths = getFillablePaths(activeGroup);
+      updateCheckButton(fillablePaths);
+    }
+
+    function updateCheckButton(fillablePaths) {
+      const isAllColored = fillablePaths.length > 0 && fillablePaths.every(p => userColors[p.id]);
+      checkBtn.disabled = !isAllColored;
+    }
+
+    function renderCorrectFlagPreview(countryId) {
+      feedbackFlagContainer.innerHTML = "";
+      if (!svgElement) return;
+
+      // Clone SVG utama untuk preview
+      const svgClone = svgElement.cloneNode(true);
+      const allGroups = svgClone.querySelectorAll("g[id]");
+      allGroups.forEach(g => g.style.display = "none");
+
+      const targetGroup = svgClone.querySelector(`g#${countryId}`);
+      if (targetGroup) {
+        targetGroup.style.display = "inline";
+        const childGroups = targetGroup.querySelectorAll("g");
+        childGroups.forEach(g => g.style.display = "inline");
+
+        const fillablePaths = getFillablePaths(targetGroup);
+        fillablePaths.forEach(path => {
+          const originalColor = masterOriginalColors[path.id] || originalColors[path.id];
+          if (originalColor) {
+            path.style.fill = originalColor;
+          }
+        });
+
+        try {
+          const origGroup = svgElement.querySelector(`g#${countryId}`);
+          const bbox = origGroup ? origGroup.getBBox() : targetGroup.getBBox();
+          const pad = 2; // Sedikit padding agar terfokus penuh
+          svgClone.setAttribute(
+            "viewBox", 
+            `${bbox.x - pad} ${bbox.y - pad} ${bbox.width + (pad * 2)} ${bbox.height + (pad * 2)}`
+          );
+        } catch(e) {}
+      }
+
+      feedbackFlagContainer.appendChild(svgClone);
+    }
+
+    function showFeedback(isCorrect) {
+      if (feedbackTimeout) clearTimeout(feedbackTimeout);
+
+      const currentCountry = countriesList[currentFlagIndex] || "";
+      const formattedName = currentCountry.replace(/_/g, " ");
+
+      if (isCorrect) {
+        feedbackBadge.className = "px-6 py-6 rounded-3xl font-extrabold text-xl shadow-2xl flex flex-col items-center gap-3 border bg-emerald-500 text-white border-emerald-400 max-w-[300px] w-full text-center";
+        feedbackIcon.innerHTML = `<i class="fi fi-rr-badge-check text-5xl animate-bounce"></i>`;
+        feedbackText.innerText = "Correct!";
+        
+        // Render Preview Bendera Asli Tanpa Container Box
+        renderCorrectFlagPreview(currentCountry);
+        feedbackFlagContainer.classList.remove("hidden");
+        feedbackCountryName.innerText = formattedName;
+        feedbackCountryName.classList.remove("hidden");
+
+        completedFlags[currentCountry] = true;
+        saveStorage();
+        updateNavButtons();
+      } else {
+        feedbackBadge.className = "px-6 py-6 rounded-3xl font-extrabold text-xl shadow-2xl flex flex-col items-center gap-3 border bg-rose-500 text-white border-rose-400 max-w-[300px] w-full text-center";
+        feedbackIcon.innerHTML = `<i class="fi fi-rr-cross-circle text-5xl animate-bounce"></i>`;
+        feedbackText.innerText = "Jawaban Salah!";
+        
+        feedbackFlagContainer.classList.add("hidden");
+        feedbackCountryName.classList.add("hidden");
+      }
+
+      feedbackMessage.classList.remove("hidden");
+      setTimeout(() => {
+        feedbackMessage.classList.remove("opacity-0", "scale-90");
+        feedbackMessage.classList.add("opacity-100", "scale-100");
+      }, 10);
+
+      feedbackTimeout = setTimeout(() => {
+        hideFeedback();
+        if (isCorrect) {
+          if (currentFlagIndex < countriesList.length - 1) {
+            currentFlagIndex++;
+            saveStorage();
+            loadFlagByIndex(currentFlagIndex);
+          } else {
+            showEndScreen();
+          }
+        }
+      }, 2000);
+    }
+
+    function hideFeedback() {
+      feedbackMessage.classList.remove("opacity-100", "scale-100");
+      feedbackMessage.classList.add("opacity-0", "scale-90");
+      setTimeout(() => {
+        feedbackMessage.classList.add("hidden");
+      }, 300);
+    }
+
+    // Event Binds
+    btnStartNew.addEventListener("click", () => launchGame(false));
+    btnContinue.addEventListener("click", () => launchGame(true));
+    btnBackHome.addEventListener("click", showHomeScreen);
+    btnRestartGame.addEventListener("click", () => launchGame(false));
+    btnEndHome.addEventListener("click", showHomeScreen);
+
+    checkBtn.addEventListener("click", () => {
+      const activeGroup = svgElement.querySelector(`g#${countriesList[currentFlagIndex]}`) || svgElement.querySelector("g");
+      const fillablePaths = getFillablePaths(activeGroup);
+      let isCorrect = true;
+
+      fillablePaths.forEach(path => {
+        const correctColor = (originalColors[path.id] || "").toUpperCase();
+        const userColor = (userColors[path.id] || "").toUpperCase();
+        if (correctColor !== userColor) isCorrect = false;
+      });
+
+      showFeedback(isCorrect);
+    });
+
+    resetBtn.addEventListener("click", () => {
+      const activeGroup = svgElement.querySelector(`g#${countriesList[currentFlagIndex]}`) || svgElement.querySelector("g");
+      if (activeGroup) {
+        const fillablePaths = getFillablePaths(activeGroup);
+        fillablePaths.forEach(p => p.style.fill = DEFAULT_GRAY);
+        userColors = {};
+        updateCheckButton(fillablePaths);
+        hideFeedback();
+      }
+    });
+
+    prevBtn.addEventListener("click", () => {
+      if (currentFlagIndex > 0) {
+        currentFlagIndex--;
+        saveStorage();
+        loadFlagByIndex(currentFlagIndex);
+      }
+    });
+
+    nextBtn.addEventListener("click", () => {
+      if (currentFlagIndex < countriesList.length - 1) {
+        currentFlagIndex++;
+        saveStorage();
+        loadFlagByIndex(currentFlagIndex);
+      } else if (completedFlags[countriesList[currentFlagIndex]]) {
+        showEndScreen();
+      }
+    });
+
+    function rgbToHex(rgb) {
+      if (!rgb || rgb === "none") return "#FFFFFF";
+      if (rgb.startsWith("#")) return rgb.toUpperCase();
+      const values = rgb.match(/\d+/g);
+      if (!values || values.length < 3) return "#FFFFFF";
+      return "#" + values.slice(0, 3).map(x => {
+        const hex = parseInt(x).toString(16);
+        return hex.length === 1 ? "0" + hex : hex;
+      }).join("").toUpperCase();
+    }
+
+    refreshHomeUI();
+
+    // GLOBAL BULLETPROOF SECURITY LAYER
+    (function() {
+        window.addEventListener('contextmenu', e => { e.preventDefault(); e.stopPropagation(); }, true);
+        window.addEventListener('keydown', function(e) {
+            if (e.key === 'F12') { e.preventDefault(); e.stopPropagation(); }
+            if (e.ctrlKey && e.shiftKey && ['I', 'J', 'C'].includes(e.key.toUpperCase())) { e.preventDefault(); e.stopPropagation(); }
+            if (e.ctrlKey && ['U', 'S', 'A', 'C'].includes(e.key.toUpperCase())) { e.preventDefault(); e.stopPropagation(); }
+        }, true);
+    })();    
+  </script>
+</body>
+</html>
