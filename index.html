@@ -151,14 +151,13 @@
     </div>
   </div>
 
-  <!-- FLOATING FEEDBACK NOTIFICATION (UPDATED: NO CONTAINER BOX & LARGER FLAG) -->
+  <!-- FLOATING FEEDBACK NOTIFICATION -->
   <div id="feedback-message" class="pointer-events-none fixed inset-0 flex items-center justify-center z-50 bg-slate-900/60 backdrop-blur-md transition-all duration-300 opacity-0 scale-90 hidden">
     <div id="feedback-badge" class="px-6 py-6 rounded-3xl font-extrabold text-xl shadow-2xl flex flex-col items-center gap-3 border transform transition-all duration-300 max-w-[300px] w-full text-center">
       <div id="feedback-icon" class="flex items-center justify-center">
         <i class="fi fi-rr-badge-check text-5xl animate-bounce"></i>
       </div>
       
-      <!-- Container Bendera Tanpa Box/Frame, Ukuran Lebih Besar (h-44) -->
       <div id="feedback-flag-container" class="w-full h-44 flex items-center justify-center overflow-hidden p-0 drop-shadow-xl hidden">
         <!-- SVG Clone ditempatkan di sini -->
       </div>
@@ -173,57 +172,211 @@
   <script>
     const countriesList = [ 
         // --- ASIA ---
-        "Afghanistan", "Armenia", "Azerbaijan", "Bahrain", "Bangladesh",
-        "Bhutan", "Brunei", "Cambodia", "China", "Cyprus",
-        "Georgia", "India", "Indonesia", "Iran", "Iraq",
-        "Israel", "Japan", "Jordan", "Kazakhstan", "Kuwait",
-        "Kyrgystan", "Laos", "Lebanon", "Malaysia", "Maldives",
-        "Mongolia", "Myanmar", "Nepal", "North_Korea", "Oman",
-        "Pakistan", "Palestine", "Philippines", "Qatar", "Russia",
-        "Saudi_Arabia", "Singapore", "South_Korea", "Sri_Lanka", "Syria",
-        "Tajikistan", "Thailand", "Timor_Leste", "Turkey", "Turkmenistan",
-        "United_Arab_Emirates", "Uzbekistan", "Vietnam", "Yemen",
+        { id: "Afghanistan", name: "Afghanistan" },
+        { id: "Armenia", name: "Armenia" },
+        { id: "Azerbaijan", name: "Azerbaijan" },
+        { id: "Bahrain", name: "Bahrain" },
+        { id: "Bangladesh", name: "Bangladesh" },
+        { id: "Bhutan", name: "Bhutan" },
+        { id: "Brunei", name: "Brunei" },
+        { id: "Cambodia", name: "Cambodia" },
+        { id: "China", name: "China" },
+        { id: "Cyprus", name: "Cyprus" },
+        { id: "Georgia", name: "Georgia" },
+        { id: "India", name: "India" },
+        { id: "Indonesia", name: "Indonesia" },
+        { id: "Iran", name: "Iran" },
+        { id: "Iraq", name: "Iraq" },
+        { id: "Israel", name: "Israel" },
+        { id: "Japan", name: "Japan" },
+        { id: "Jordan", name: "Jordan" },
+        { id: "Kazakhstan", name: "Kazakhstan" },
+        { id: "Kuwait", name: "Kuwait" },
+        { id: "Kyrgystan", name: "Kyrgyzstan" },
+        { id: "Laos", name: "Laos" },
+        { id: "Lebanon", name: "Lebanon" },
+        { id: "Malaysia", name: "Malaysia" },
+        { id: "Maldives", name: "Maldives" },
+        { id: "Mongolia", name: "Mongolia" },
+        { id: "Myanmar", name: "Myanmar" },
+        { id: "Nepal", name: "Nepal" },
+        { id: "North_Korea", name: "North Korea" },
+        { id: "Oman", name: "Oman" },
+        { id: "Pakistan", name: "Pakistan" },
+        { id: "Palestine", name: "Palestine" },
+        { id: "Philippines", name: "Philippines" },
+        { id: "Qatar", name: "Qatar" },
+        { id: "Russia", name: "Russia" },
+        { id: "Saudi_Arabia", name: "Saudi Arabia" },
+        { id: "Singapore", name: "Singapore" },
+        { id: "South_Korea", name: "South Korea" },
+        { id: "Sri_Lanka", name: "Sri Lanka" },
+        { id: "Syria", name: "Syria" },
+        { id: "Tajikistan", name: "Tajikistan" },
+        { id: "Thailand", name: "Thailand" },
+        { id: "Timor_Leste", name: "Timor-Leste" },
+        { id: "Turkey", name: "Turkey" },
+        { id: "Turkmenistan", name: "Turkmenistan" },
+        { id: "United_Arab_Emirates", name: "United Arab Emirates" },
+        { id: "Uzbekistan", name: "Uzbekistan" },
+        { id: "Vietnam", name: "Vietnam" },
+        { id: "Yemen", name: "Yemen" },
 
         // --- EROPA ---
-        "Albania", "Andorra", "Austria", "Belarus", "Belgium",
-        "Bosnia_and_Herzegovina", "Bulgaria", "Croatia", "Czech_Republic", "Denmark",
-        "Estonia", "Finland", "France", "Germany", "Greece",
-        "Hungary", "Iceland", "Ireland", "Italy", "Latvia",
-        "Liechtenstein", "Lithuania", "Luxembourg", "Malta", "Moldova",
-        "Monaco", "Montenegro", "Netherlands", "North_Macedonia", "Norway",
-        "Poland", "Portugal", "Romania", "San_Marino", "Serbia",
-        "Slovakia", "Slovenia", "Spain", "Sweden", "Switzerland",
-        "Ukraine", "United_Kingdom", "Vatican_City",
+        { id: "Albania", name: "Albania" },
+        { id: "Andorra", name: "Andorra" },
+        { id: "Austria", name: "Austria" },
+        { id: "Belarus", name: "Belarus" },
+        { id: "Belgium", name: "Belgium" },
+        { id: "Bosnia_and_Herzegovina", name: "Bosnia and Herzegovina" },
+        { id: "Bulgaria", name: "Bulgaria" },
+        { id: "Croatia", name: "Croatia" },
+        { id: "Czech_Republic", name: "Czech Republic" },
+        { id: "Denmark", name: "Denmark" },
+        { id: "Estonia", name: "Estonia" },
+        { id: "Finland", name: "Finland" },
+        { id: "France", name: "France" },
+        { id: "Germany", name: "Germany" },
+        { id: "Greece", name: "Greece" },
+        { id: "Hungary", name: "Hungary" },
+        { id: "Iceland", name: "Iceland" },
+        { id: "Ireland", name: "Ireland" },
+        { id: "Italy", name: "Italy" },
+        { id: "Latvia", name: "Latvia" },
+        { id: "Liechtenstein", name: "Liechtenstein" },
+        { id: "Lithuania", name: "Lithuania" },
+        { id: "Luxembourg", name: "Luxembourg" },
+        { id: "Malta", name: "Malta" },
+        { id: "Moldova", name: "Moldova" },
+        { id: "Monaco", name: "Monaco" },
+        { id: "Montenegro", name: "Montenegro" },
+        { id: "Netherlands", name: "Netherlands" },
+        { id: "North_Macedonia", name: "North Macedonia" },
+        { id: "Norway", name: "Norway" },
+        { id: "Poland", name: "Poland" },
+        { id: "Portugal", name: "Portugal" },
+        { id: "Romania", name: "Romania" },
+        { id: "San_Marino", name: "San Marino" },
+        { id: "Serbia", name: "Serbia" },
+        { id: "Slovakia", name: "Slovakia" },
+        { id: "Slovenia", name: "Slovenia" },
+        { id: "Spain", name: "Spain" },
+        { id: "Sweden", name: "Sweden" },
+        { id: "Switzerland", name: "Switzerland" },
+        { id: "Ukraine", name: "Ukraine" },
+        { id: "United_Kingdom", name: "United Kingdom" },
+        { id: "Vatican_City", name: "Vatican City" },
 
         // --- AFRIKA ---
-        "Algeria", "Angola", "Benin", "Botswana", "Burkina_Faso",
-        "Burundi", "Cabo_Verde", "Cameroon", "Central_African_Republic", "Chad",
-        "Comoros", "Democratic_Republic_of_the_Congo", "Djibouti", "Egypt", "Equatorial_Guinea",
-        "Eritrea", "Eswatini", "Ethiopia", "Gabon", "Gambia",
-        "Ghana", "Guinea", "Guinea_Bissau", "Côte d'Ivoire", "Kenya",
-        "Lesotho", "Liberia", "Libya", "Madagascar", "Malawi",
-        "Mali", "Mauritania", "Mauritius", "Morocco", "Mozambique",
-        "Namibia", "Niger", "Nigeria", "Republic_of_the_Congo", "Rwanda",
-        "São_Tomé_and_Príncipe", "Senegal", "Seychelles", "Sierra_Leone", "Somalia",
-        "South_Africa", "South_Sudan", "Sudan", "Tanzania", "Togo",
-        "Tunisia", "Uganda", "Zambia", "Zimbabwe",
+        { id: "Algeria", name: "Algeria" },
+        { id: "Angola", name: "Angola" },
+        { id: "Benin", name: "Benin" },
+        { id: "Botswana", name: "Botswana" },
+        { id: "Burkina_Faso", name: "Burkina Faso" },
+        { id: "Burundi", name: "Burundi" },
+        { id: "Cabo_Verde", name: "Cabo Verde" },
+        { id: "Cameroon", name: "Cameroon" },
+        { id: "Central_African_Republic", name: "Central African Republic" },
+        { id: "Chad", name: "Chad" },
+        { id: "Comoros", name: "Comoros" },
+        { id: "Democratic_Republic_of_the_Congo", name: "Democratic Republic of the Congo" },
+        { id: "Djibouti", name: "Djibouti" },
+        { id: "Egypt", name: "Egypt" },
+        { id: "Equatorial_Guinea", name: "Equatorial Guinea" },
+        { id: "Eritrea", name: "Eritrea" },
+        { id: "Eswatini", name: "Eswatini" },
+        { id: "Ethiopia", name: "Ethiopia" },
+        { id: "Gabon", name: "Gabon" },
+        { id: "Gambia", name: "Gambia" },
+        { id: "Ghana", name: "Ghana" },
+        { id: "Guinea", name: "Guinea" },
+        { id: "Guinea_Bissau", name: "Guinea-Bissau" },
+        { id: "Cote_d_Ivoire", name: "Côte d'Ivoire" },
+        { id: "Kenya", name: "Kenya" },
+        { id: "Lesotho", name: "Lesotho" },
+        { id: "Liberia", name: "Liberia" },
+        { id: "Libya", name: "Libya" },
+        { id: "Madagascar", name: "Madagascar" },
+        { id: "Malawi", name: "Malawi" },
+        { id: "Mali", name: "Mali" },
+        { id: "Mauritania", name: "Mauritania" },
+        { id: "Mauritius", name: "Mauritius" },
+        { id: "Morocco", name: "Morocco" },
+        { id: "Mozambique", name: "Mozambique" },
+        { id: "Namibia", name: "Namibia" },
+        { id: "Niger", name: "Niger" },
+        { id: "Nigeria", name: "Nigeria" },
+        { id: "Republic_of_the_Congo", name: "Republic of the Congo" },
+        { id: "Rwanda", name: "Rwanda" },
+        { id: "Sao_Tome_and_Principe", name: "São Tomé and Príncipe" },
+        { id: "Senegal", name: "Senegal" },
+        { id: "Seychelles", name: "Seychelles" },
+        { id: "Sierra_Leone", name: "Sierra Leone" },
+        { id: "Somalia", name: "Somalia" },
+        { id: "South_Africa", name: "South Africa" },
+        { id: "South_Sudan", name: "South Sudan" },
+        { id: "Sudan", name: "Sudan" },
+        { id: "Tanzania", name: "Tanzania" },
+        { id: "Togo", name: "Togo" },
+        { id: "Tunisia", name: "Tunisia" },
+        { id: "Uganda", name: "Uganda" },
+        { id: "Zambia", name: "Zambia" },
+        { id: "Zimbabwe", name: "Zimbabwe" },
 
         // --- AMERIKA UTARA & KARIBIA ---
-        "Antigua_and_Barbuda", "Bahamas", "Barbados", "Belize", "Canada",
-        "Costa_Rica", "Cuba", "Dominica", "Dominican_Republic", "El_Salvador",
-        "Grenada", "Guatemala", "Haiti", "Honduras", "Jamaica",
-        "Mexico", "Nicaragua", "Panama", "Saint_Kitts_and_Nevis", "Saint_Lucia",
-        "Saint_Vincent_and_the_Grenadines", "Trinidad_and_Tobago", "United_States",
+        { id: "Antigua_and_Barbuda", name: "Antigua and Barbuda" },
+        { id: "Bahamas", name: "Bahamas" },
+        { id: "Barbados", name: "Barbados" },
+        { id: "Belize", name: "Belize" },
+        { id: "Canada", name: "Canada" },
+        { id: "Costa_Rica", name: "Costa Rica" },
+        { id: "Cuba", name: "Cuba" },
+        { id: "Dominica", name: "Dominica" },
+        { id: "Dominican_Republic", name: "Dominican Republic" },
+        { id: "El_Salvador", name: "El Salvador" },
+        { id: "Grenada", name: "Grenada" },
+        { id: "Guatemala", name: "Guatemala" },
+        { id: "Haiti", name: "Haiti" },
+        { id: "Honduras", name: "Honduras" },
+        { id: "Jamaica", name: "Jamaica" },
+        { id: "Mexico", name: "Mexico" },
+        { id: "Nicaragua", name: "Nicaragua" },
+        { id: "Panama", name: "Panama" },
+        { id: "Saint_Kitts_and_Nevis", name: "Saint Kitts and Nevis" },
+        { id: "Saint_Lucia", name: "Saint Lucia" },
+        { id: "Saint_Vincent_and_the_Grenadines", name: "Saint Vincent and the Grenadines" },
+        { id: "Trinidad_and_Tobago", name: "Trinidad and Tobago" },
+        { id: "United_States", name: "United States" },
       
         // --- AMERIKA SELATAN ---
-        "Argentina", "Bolivia", "Brazil", "Chile", "Colombia",
-        "Ecuador", "Guyana", "Paraguay", "Peru", "Suriname",
-        "Uruguay", "Venezuela",
+        { id: "Argentina", name: "Argentina" },
+        { id: "Bolivia", name: "Bolivia" },
+        { id: "Brazil", name: "Brazil" },
+        { id: "Chile", name: "Chile" },
+        { id: "Colombia", name: "Colombia" },
+        { id: "Ecuador", name: "Ecuador" },
+        { id: "Guyana", name: "Guyana" },
+        { id: "Paraguay", name: "Paraguay" },
+        { id: "Peru", name: "Peru" },
+        { id: "Suriname", name: "Suriname" },
+        { id: "Uruguay", name: "Uruguay" },
+        { id: "Venezuela", name: "Venezuela" },
 
         // --- AUSTRALIA & OCEANIA ---
-        "Australia", "Federated_States_of_Micronesia", "Fiji", "Kiribati", "Marshall_Islands",
-        "Nauru", "New_Zealand", "Palau", "Papua_New_Guinea", "Samoa",
-        "Solomon_Islands", "Tonga", "Tuvalu", "Vanuatu"
+        { id: "Australia", name: "Australia" },
+        { id: "Federated_States_of_Micronesia", name: "Federated States of Micronesia" },
+        { id: "Fiji", name: "Fiji" },
+        { id: "Kiribati", name: "Kiribati" },
+        { id: "Marshall_Islands", name: "Marshall Islands" },
+        { id: "Nauru", name: "Nauru" },
+        { id: "New_Zealand", name: "New Zealand" },
+        { id: "Palau", name: "Palau" },
+        { id: "Papua_New_Guinea", name: "Papua New Guinea" },
+        { id: "Samoa", name: "Samoa" },
+        { id: "Solomon_Islands", name: "Solomon Islands" },
+        { id: "Tonga", name: "Tonga" },
+        { id: "Tuvalu", name: "Tuvalu" },
+        { id: "Vanuatu", name: "Vanuatu" }
     ];
 
     const DEFAULT_GRAY = "#D1D5DB";
@@ -318,13 +471,13 @@
       if (!svgElement) return;
       masterOriginalColors = {};
 
-      countriesList.forEach(countryId => {
-        const group = svgElement.querySelector(`g#${countryId}`);
+      countriesList.forEach(country => {
+        const group = svgElement.querySelector(`g#${country.id}`);
         if (!group) return;
         
         const paths = group.querySelectorAll("path, rect, circle, polygon, ellipse");
         paths.forEach((p, idx) => {
-          if (!p.id) p.id = `${countryId}-part-${idx}`;
+          if (!p.id) p.id = `${country.id}-part-${idx}`;
           
           let rawFill = p.getAttribute("fill");
           if (!rawFill || rawFill === "none") {
@@ -399,8 +552,8 @@
     function loadFlagByIndex(index) {
       if (!svgElement) return;
 
-      const countryId = countriesList[index] || countriesList[0];
-      countryTitle.innerText = countryId.replace(/_/g, " ");
+      const country = countriesList[index] || countriesList[0];
+      countryTitle.innerText = country.name;
       hideFeedback();
       userColors = {};
       originalColors = {};
@@ -409,7 +562,7 @@
       const allGroups = svgElement.querySelectorAll("g[id]");
       allGroups.forEach(g => g.style.display = "none");
 
-      let targetGroup = svgElement.querySelector(`g#${countryId}`);
+      let targetGroup = svgElement.querySelector(`g#${country.id}`);
       if (!targetGroup && allGroups.length > 0) {
         targetGroup = allGroups[0];
       }
@@ -423,7 +576,7 @@
       const fillablePaths = getFillablePaths(targetGroup);
 
       fillablePaths.forEach((path, idx) => {
-        if (!path.id) path.id = `${countryId}-part-${idx}`;
+        if (!path.id) path.id = `${country.id}-part-${idx}`;
 
         let hexColor = masterOriginalColors[path.id];
         if (!hexColor || hexColor === DEFAULT_GRAY) {
@@ -458,7 +611,8 @@
 
     function updateNavButtons() {
       prevBtn.disabled = currentFlagIndex === 0;
-      const isDone = completedFlags[countriesList[currentFlagIndex]] === true;
+      const currentCountry = countriesList[currentFlagIndex];
+      const isDone = completedFlags[currentCountry.id] === true;
       nextBtn.disabled = !isDone;
     }
 
@@ -493,7 +647,8 @@
       path.style.fill = selectedColor;
       userColors[path.id] = selectedColor;
 
-      const activeGroup = svgElement.querySelector(`g#${countriesList[currentFlagIndex]}`) || svgElement.querySelector("g");
+      const currentCountry = countriesList[currentFlagIndex];
+      const activeGroup = svgElement.querySelector(`g#${currentCountry.id}`) || svgElement.querySelector("g");
       const fillablePaths = getFillablePaths(activeGroup);
       updateCheckButton(fillablePaths);
     }
@@ -543,8 +698,7 @@
     function showFeedback(isCorrect) {
       if (feedbackTimeout) clearTimeout(feedbackTimeout);
 
-      const currentCountry = countriesList[currentFlagIndex] || "";
-      const formattedName = currentCountry.replace(/_/g, " ");
+      const currentCountry = countriesList[currentFlagIndex] || { id: "", name: "" };
 
       if (isCorrect) {
         feedbackBadge.className = "px-6 py-6 rounded-3xl font-extrabold text-xl shadow-2xl flex flex-col items-center gap-3 border bg-emerald-500 text-white border-emerald-400 max-w-[300px] w-full text-center";
@@ -552,12 +706,12 @@
         feedbackText.innerText = "Correct!";
         
         // Render Preview Bendera Asli Tanpa Container Box
-        renderCorrectFlagPreview(currentCountry);
+        renderCorrectFlagPreview(currentCountry.id);
         feedbackFlagContainer.classList.remove("hidden");
-        feedbackCountryName.innerText = formattedName;
+        feedbackCountryName.innerText = currentCountry.name;
         feedbackCountryName.classList.remove("hidden");
 
-        completedFlags[currentCountry] = true;
+        completedFlags[currentCountry.id] = true;
         saveStorage();
         updateNavButtons();
       } else {
@@ -605,7 +759,8 @@
     btnEndHome.addEventListener("click", showHomeScreen);
 
     checkBtn.addEventListener("click", () => {
-      const activeGroup = svgElement.querySelector(`g#${countriesList[currentFlagIndex]}`) || svgElement.querySelector("g");
+      const currentCountry = countriesList[currentFlagIndex];
+      const activeGroup = svgElement.querySelector(`g#${currentCountry.id}`) || svgElement.querySelector("g");
       const fillablePaths = getFillablePaths(activeGroup);
       let isCorrect = true;
 
@@ -619,7 +774,8 @@
     });
 
     resetBtn.addEventListener("click", () => {
-      const activeGroup = svgElement.querySelector(`g#${countriesList[currentFlagIndex]}`) || svgElement.querySelector("g");
+      const currentCountry = countriesList[currentFlagIndex];
+      const activeGroup = svgElement.querySelector(`g#${currentCountry.id}`) || svgElement.querySelector("g");
       if (activeGroup) {
         const fillablePaths = getFillablePaths(activeGroup);
         fillablePaths.forEach(p => p.style.fill = DEFAULT_GRAY);
@@ -642,7 +798,7 @@
         currentFlagIndex++;
         saveStorage();
         loadFlagByIndex(currentFlagIndex);
-      } else if (completedFlags[countriesList[currentFlagIndex]]) {
+      } else if (completedFlags[countriesList[currentFlagIndex].id]) {
         showEndScreen();
       }
     });
